@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tnt-red: #E31E24;
+  --tnt-silver: #C0C0C0;
+  --tnt-metallic: #8B8B8B;
+  --tnt-black: #000000;
+  --tnt-dark-grey: #1A1A1A;
+  --gnet-purple: #667eea;
+  --gnet-violet: #764ba2;
+  --groundspan-blue: #2563EB;
+}
+
+@layer base {
+  body {
+    @apply bg-tnt-black text-white;
+  }
+}
+
+@layer components {
+  /* Luxury Buttons - Refined & Elegant */
+  .btn-primary {
+    @apply bg-tnt-red text-white px-10 py-4 font-light tracking-widest uppercase text-sm hover:bg-red-700 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed border border-tnt-red hover:border-white;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-tnt-silver px-10 py-4 font-light tracking-widest uppercase text-sm hover:bg-tnt-silver/10 border border-tnt-silver/40 hover:border-tnt-silver transition-all duration-300;
+  }
+
+  /* Input Fields - Minimal & Sophisticated */
+  .input-field {
+    @apply w-full px-5 py-4 border border-tnt-silver/30 bg-black/50 text-white font-light focus:outline-none focus:border-tnt-silver focus:bg-black transition-all duration-300 placeholder:text-tnt-silver/40;
+  }
+
+  /* Cards - Subtle & Refined */
+  .card {
+    @apply bg-tnt-dark-grey/30 border border-tnt-silver/20 p-8;
+  }
+
+  .price-card {
+    @apply bg-black/40 border border-tnt-silver/20 p-6 hover:border-tnt-red/60 hover:bg-black/60 transition-all duration-300 cursor-pointer;
+  }
+
+  /* Luxury Dividers */
+  .luxury-divider {
+    @apply h-px bg-gradient-to-r from-transparent via-tnt-red to-transparent;
+  }
+
+  /* Premium Text Styles */
+  .text-luxury {
+    @apply font-light tracking-wide text-tnt-silver;
+  }
+
+  .text-elegant {
+    @apply font-light tracking-tight leading-tight;
+  }
+}
