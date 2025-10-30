@@ -9,9 +9,9 @@
 
 ## 🎯 What You're Getting
 
-A fully functional corporate pricing portal with **74 pre-configured routes** from your Capital One contract, running at:
+A fully functional corporate pricing portal with **74 pre-configured routes** from your Capital One contract.
 
-**Live Demo:** https://tnt-groundspan-pricing-tool.vercel.app/groundspan
+**Access the portal at:** `/groundspan` route when running locally
 
 ---
 
@@ -39,10 +39,6 @@ Cville → Central Virginia = $300 (3 hours)
 
 ## 🚀 Quick Start (5 Minutes)
 
-### Option 1: Use the Live Demo
-Just visit: https://tnt-groundspan-pricing-tool.vercel.app/groundspan
-
-### Option 2: Run Locally
 ```bash
 # 1. Clone the repo
 git clone https://github.com/sperry-entelech/tnt-groundspan-pricing-tool.git
@@ -54,11 +50,11 @@ npm install
 # 3. Start dev server
 npm run dev
 
-# 4. Open browser
+# 4. Open browser to the Groundspan portal
 http://localhost:3000/groundspan
 ```
 
-**That's it.** Mapbox is already configured, all routes are loaded.
+**That's it.** Mapbox is already configured, all 74 routes are loaded and ready to use.
 
 ---
 
@@ -165,9 +161,7 @@ Expected Rate: $110/hour
 
 ## 🚀 Deployment Options
 
-### Option 1: Vercel (Easiest - Already Live)
-
-The demo is already deployed. To deploy your own:
+### Option 1: Vercel (Recommended)
 
 1. Fork the GitHub repo
 2. Sign up at https://vercel.com
@@ -176,7 +170,7 @@ The demo is already deployed. To deploy your own:
 5. Add environment variable: `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`
 6. Deploy!
 
-**Custom Domain:** Point `groundspan.tntlimousine.com` to Vercel
+**Custom Domain:** You can point `groundspan.tntlimousine.com` or any domain to your Vercel deployment
 
 ### Option 2: Self-Hosted
 
