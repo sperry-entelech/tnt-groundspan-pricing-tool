@@ -38,7 +38,7 @@ export default function AddressAutocomplete({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const debounceTimer = useRef<NodeJS.Timeout>();
+  const debounceTimer = useRef<NodeJS.Timeout | undefined>(undefined);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Close suggestions when clicking outside
