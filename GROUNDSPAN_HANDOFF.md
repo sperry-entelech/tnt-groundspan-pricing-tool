@@ -1,240 +1,182 @@
-# 📦 Groundspan Corporate Portal - Handoff Documentation
+# 🚀 Groundspan Corporate Portal - Ready for Deployment
 
 **Project:** TNT Transportation Platform - Groundspan Corporate Integration
-**Status:** Phase 1-3 Complete, Ready for Corporate Customization
-**Date:** 2025-10-29
-**Contact:** Sperry Entelech
+**Status:** ✅ **Production Ready**
+**Date:** 2025-10-30
+**GitHub:** https://github.com/sperry-entelech/tnt-groundspan-pricing-tool
 
 ---
 
-## 🎯 Executive Summary
+## 🎯 What You're Getting
 
-This is a production-ready Next.js application for TNT Limousine's premium transportation booking system with **three distinct portals**:
+A fully functional corporate pricing portal with **74 pre-configured routes** from your Capital One contract, running at:
 
-1. **Retail Portal** (/) - Public customer pricing
-2. **GNET Partner Portal** (/gnet) - Partner network pricing
-3. **Groundspan Corporate Portal** (/groundspan) - Your custom corporate pricing
-
-The Groundspan portal uses **route-based pricing** extracted from your Capital One contract (74 unique routes), calculated based on total driver time including travel to/from base.
+**Live Demo:** https://tnt-groundspan-pricing-tool.vercel.app/groundspan
 
 ---
 
-## ✅ What's Working Now
+## ✅ Everything Already Works
 
-### Core Functionality
-- ✅ **Real-time Address Autocomplete** (Mapbox integration)
-- ✅ **Three Platform-Specific Portals** with distinct branding
-- ✅ **Quote Calculator** with service type selection
-- ✅ **Smart Pricing Comparison** (hourly vs point-to-point)
-- ✅ **Platform Isolation** (no cross-portal navigation)
-- ✅ **Luxury Black/Red/Silver Design** matching TNT branding
-- ✅ **Call-to-Action Buttons** (Call, Email, Modify Quote)
-- ✅ **Responsive Design** (mobile, tablet, desktop)
+### Core Features
+- ✅ **74 Route-Based Prices** - All your Capital One routes configured
+- ✅ **Origin/Destination Selection** - Dropdowns filter based on available routes
+- ✅ **Three Service Types** - Ground, Arrival, Departure
+- ✅ **Real-Time Address Autocomplete** - Mapbox already configured
+- ✅ **Smart Calculator** - Uses your corporate rates automatically
+- ✅ **"Corporate Priority Access" Branding** - Professional blue/black design
+- ✅ **Mobile Responsive** - Works on all devices
+- ✅ **Platform Isolation** - Separate from retail/GNET portals
 
-### Pricing Data Loaded
-- ✅ **245+ retail pricing data points**
-- ✅ **74 Groundspan corporate routes** (from Pricing_4_ZoneRates.xlsx)
-- ✅ **7 vehicle types** with capacity specifications
-- ✅ **5 airports** (RIC, DCA, IAD, BWI, CHO)
-- ✅ **4 service zones** (Central Virginia, Prince George, Norfolk, Charlottesville)
-- ✅ **Automatic discount calculations** (Monday-Thursday, 6+ hours, etc.)
-
-### Technical Stack
+### Example Routes Already Configured
 ```
-Frontend:
-├── Next.js 16.0.1 (App Router + Turbopack)
-├── React 19.2.0
-├── TypeScript 5.9.3
-└── Tailwind CSS 3.4.0
-
-Integrations Ready:
-├── Mapbox Geocoding (configured)
-├── Supabase (installed, not yet integrated)
-├── Stripe (installed, not yet integrated)
-└── Date-fns for date handling
+Central Virginia → DCA = $455 (5 hours total driver time)
+Central Virginia → RIC = $110 (1 hour)
+McLean VA → DCA = $170 (Arrival)
+Cville → Central Virginia = $300 (3 hours)
 ```
 
 ---
 
-## 🚨 Critical: What Needs Implementation
+## 🚀 Quick Start (5 Minutes)
 
-### 1. **Groundspan Route-Based Pricing Logic**
+### Option 1: Use the Live Demo
+Just visit: https://tnt-groundspan-pricing-tool.vercel.app/groundspan
 
-**Current Status:** Data extracted, but calculator uses retail logic
-**What Needs Work:** Update pricing calculator to use route-based pricing for Groundspan
+### Option 2: Run Locally
+```bash
+# 1. Clone the repo
+git clone https://github.com/sperry-entelech/tnt-groundspan-pricing-tool.git
+cd tnt-groundspan-pricing-tool
 
-**File to Update:** `src/lib/pricing-calculator.ts`
+# 2. Install dependencies
+npm install
 
-**Required Changes:**
+# 3. Start dev server
+npm run dev
+
+# 4. Open browser
+http://localhost:3000/groundspan
+```
+
+**That's it.** Mapbox is already configured, all routes are loaded.
+
+---
+
+## 📊 How Route-Based Pricing Works
+
+### Your Contract Model
+Unlike retail pricing (simple $100/hour), your corporate rates are **route-specific** and based on **total driver time commitment**.
+
+**Example: Central Virginia → DCA**
+
+| What | Time |
+|------|------|
+| Driver leaves base → Pickup location | 30 min |
+| Pickup → DCA | 2 hours |
+| Service/wait time | 30 min |
+| DCA → Back to base | 2 hours |
+| **Total Driver Commitment** | **5 hours** |
+| **Your Rate** | **$455** |
+
+This is why your DCA rate ($455) is different from the retail rate - **it includes the full round-trip driver commitment**.
+
+---
+
+## 🔧 Customization Guide
+
+### Update Contact Information
+
+**File:** `src/app/groundspan/page.tsx`
+
+**Current:**
+- Email: `sedan@tntauto.com`
+- Phone: `(804) 435-4225`
+
+**To Change:**
 ```typescript
-// Current: Uses simple hourly/point-to-point rates
-// Needed: Lookup route from origin→destination in Groundspan routes
+// Line 18-24: Update these values
+<a href="mailto:YOUR_EMAIL_HERE">
+  YOUR_EMAIL_HERE
+</a>
 
-if (platform === 'groundspan') {
-  // Use GROUNDSPAN_ROUTES from src/config/groundspan-rates.ts
-  const route = getGroundspanRouteRate(
-    vehicleId,
-    origin,
-    destination,
-    serviceType // 'ground' | 'arrival' | 'departure'
-  );
-
-  return route.rate; // Already includes estimated hours
-}
+<a href="tel:YOUR_PHONE_HERE">
+  YOUR_PHONE_HERE
+</a>
 ```
 
-**See:** `GROUNDSPAN_PRICING_ANALYSIS.md` for full details
+### Add Your Logo
 
-### 2. **Groundspan UI Updates**
-
-**Current Status:** Uses same form as retail/GNET
-**What Needs Work:** Custom origin/destination selector
-
-**File to Update:** `src/app/groundspan/page.tsx` and `QuoteCalculator.tsx`
-
-**Required UI:**
-- Origin selection dropdown (Central Virginia, McLean VA, Cville)
-- Destination selection dropdown (based on available routes for origin)
-- Service type: Ground / Arrival / Departure
-- Display estimated hours in quote results
-
-### 3. **Data Verification**
-
-**⚠️ IMPORTANT:** You found a data error in row 8 of the Excel file:
-- "Cville → Central Virginia" shows **0.003 hours**
-- Should this be **3.0 hours**?
-
-**Action Required:** Review and correct in `src/config/groundspan-rates.ts` line 90
-
----
-
-## 📊 Pricing Verification Checklist
-
-To ensure pricing accuracy, verify these calculations:
-
-### Test Case 1: Short Local Trip
-```
-Vehicle: Lincoln MKT (sedan)
-Route: Central Virginia → Richmond International Airport
-Service: Departure
-Expected: $110 (1 hour estimated)
-File: groundspan-rates.ts line 84
+1. Add logo file to `public/images/your-logo.png`
+2. Update `src/app/groundspan/page.tsx` line 13-21:
+```typescript
+<Image
+  src="/images/your-logo.png"  // Change this
+  alt="Your Company"
+  width={200}
+  height={80}
+/>
 ```
 
-### Test Case 2: Long Distance Trip
-```
-Vehicle: Lincoln MKT (sedan)
-Route: Central Virginia → Ronald Reagan National Airport
-Service: Departure
-Expected: $455 (5 hours estimated - includes round trip driver time)
-File: groundspan-rates.ts line 86
-```
+### Change Brand Colors
 
-### Test Case 3: Ground Service
-```
-Vehicle: Lincoln Aviator (sedan)
-Route: Central Virginia → Central Virginia
-Service: Ground
-Expected: $110/hour
-File: groundspan-rates.ts line 94
-```
+**File:** `tailwind.config.ts`
 
-### Verification Steps:
-1. ✅ Compare against Capital One contract/pricing sheet
-2. ✅ Verify estimated hours match actual drive time calculations
-3. ✅ Check all 74 routes for data entry accuracy
-4. ✅ Test edge cases (round trips, multi-stop, etc.)
-
----
-
-## 🔧 Configuration Files
-
-### Environment Variables (`.env.local`)
-
-**Required:**
-```bash
-# Mapbox (Already configured)
-NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_token_here
-
-# Future (Not yet implemented):
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-STRIPE_SECRET_KEY=your_stripe_secret
-```
-
-### Key Configuration Files
-
-| File | Purpose | Status |
-|---|---|---|
-| `src/config/groundspan-rates.ts` | Corporate route pricing (74 routes) | ✅ Complete |
-| `src/config/rates.ts` | Retail/GNET pricing (245+ rates) | ✅ Complete |
-| `src/config/vehicles.ts` | Vehicle definitions | ✅ Complete |
-| `src/config/airports.ts` | Airport/zone definitions | ✅ Complete |
-| `src/lib/pricing-calculator.ts` | Pricing logic engine | ⏳ Needs Groundspan integration |
-| `src/app/groundspan/page.tsx` | Corporate portal UI | ⏳ Needs route UI |
-
----
-
-## 🧪 Testing Guide
-
-### Manual Testing Checklist
-
-**Retail Portal (http://localhost:3070/)**
-- [ ] Select Hourly service, sedan, Monday, 4 hours
-- [ ] Verify Monday discount applied (10% off)
-- [ ] Select Point-to-Point service
-- [ ] Verify address autocomplete works
-- [ ] Select Airport service, RIC airport
-- [ ] Verify flat rate of $105 displays
-
-**GNET Portal (http://localhost:3070/gnet)**
-- [ ] Verify purple branding and "Partner Portal" badge
-- [ ] Generate same quote as retail
-- [ ] Verify pricing matches retail (GNET uses same rates)
-- [ ] Check partner commission info displays
-
-**Groundspan Portal (http://localhost:3070/groundspan)**
-- [ ] Verify blue branding and "Corporate Account" badge
-- [ ] ⚠️ Currently uses retail logic - needs route-based implementation
-- [ ] After implementation: Test origin→destination selection
-- [ ] Verify corporate rates apply (different from retail)
-
-### Automated Testing (Future)
-```bash
-# Run tests (not yet implemented)
-npm run test
-
-# Type checking
-npm run type-check
-
-# Lint
-npm run lint
+```typescript
+// Line 20: Change corporate blue
+'groundspan-blue': '#2563EB'  // Your corporate color here
 ```
 
 ---
 
-## 🚀 Deployment Instructions
+## 📋 Pricing Verification Checklist
 
-### Option 1: Vercel (Recommended)
+Before deploying, verify these test cases match your contract:
 
-1. **Push to GitHub:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: TNT Transportation Platform"
-   git remote add origin your-repo-url
-   git push -u origin main
-   ```
+### Test 1: Short Airport Trip
+```
+Origin: Central Virginia
+Destination: Richmond International Airport (RIC)
+Service Type: Departure
+Vehicle: Lincoln MKT (Sedan)
+Expected Rate: $110 (1 hour)
+```
 
-2. **Deploy to Vercel:**
-   - Sign up at https://vercel.com
-   - Import GitHub repository
-   - Add environment variables (Mapbox token)
-   - Deploy!
+### Test 2: Long Distance Airport
+```
+Origin: Central Virginia
+Destination: Ronald Reagan National (DCA)
+Service Type: Departure
+Vehicle: Lincoln MKT (Sedan)
+Expected Rate: $455 (5 hours total driver time)
+```
 
-3. **Custom Domain (Optional):**
-   - groundspan.tntlimousine.com
-   - Configure DNS in Vercel dashboard
+### Test 3: Ground Service
+```
+Origin: Central Virginia
+Destination: Central Virginia
+Service Type: Ground
+Vehicle: Lincoln Aviator (Sedan)
+Expected Rate: $110/hour
+```
+
+**Action:** Compare these against your Capital One contract and verify rates match.
+
+---
+
+## 🚀 Deployment Options
+
+### Option 1: Vercel (Easiest - Already Live)
+
+The demo is already deployed. To deploy your own:
+
+1. Fork the GitHub repo
+2. Sign up at https://vercel.com
+3. Click "Import Project"
+4. Select your forked repo
+5. Add environment variable: `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`
+6. Deploy!
+
+**Custom Domain:** Point `groundspan.tntlimousine.com` to Vercel
 
 ### Option 2: Self-Hosted
 
@@ -245,237 +187,154 @@ npm run build
 # Start production server
 npm run start
 
-# Or use PM2 for process management
-pm2 start npm --name "tnt-platform" -- start
-```
-
-### Environment Variables for Production
-
-⚠️ **Create production Mapbox token** with URL restrictions:
-```
-https://groundspan.tntlimousine.com/*
-https://*.vercel.app/*
+# Runs on http://localhost:3000
 ```
 
 ---
 
-## 📋 Groundspan-Specific Customization Guide
+## 📊 All 74 Routes Configured
 
-### Change 1: Update Contact Information
+Your routes are in `src/config/groundspan-rates.ts`:
 
-**File:** `src/app/groundspan/page.tsx`
-```typescript
-// Lines 18, 34, etc.
-// Replace: corporate@tntlimousine.com
-// With: your-corporate-email@groundspan.com
+**Vehicles:**
+- Lincoln MKT (Sedan - 3 passengers)
+- Lincoln Aviator (Sedan - 4 passengers)
+- Temsa Limo Bus (28 passengers)
+- Mercedes Sprinter Mini Bus (14 passengers)
+- Ford Transit (10 passengers)
 
-// Replace: (804) XXX-XXXX
-// With: actual corporate hotline number
-```
+**Origins:**
+- Central Virginia
+- McLean VA
+- Cville (Charlottesville)
 
-### Change 2: Add Corporate Logo
+**Destinations:**
+- Richmond International (RIC)
+- Reagan National (DCA)
+- Dulles International (IAD)
+- BWI Airport
+- Charlottesville (CHO)
+- Central Virginia
+- Prince George
+- Norfolk
+- Plus internal routes
 
-**Files to Update:**
-- `public/images/groundspan-logo.png` (add logo file)
-- `src/app/groundspan/page.tsx` (line 13-21 - update Image component)
-
-### Change 3: Customize Branding Colors
-
-**File:** `tailwind.config.ts`
-```typescript
-// Line 20: groundspan-blue color
-'groundspan-blue': '#2563EB', // Change to your corporate blue
-```
-
-### Change 4: Add Corporate Account Features
-
-**Suggestions:**
-- Employee login/authentication
-- Account number tracking
-- Monthly invoicing
-- Trip history
-- Approval workflows
+**Service Types:**
+- Ground (hourly, within location)
+- Arrival (pickup from airport)
+- Departure (dropoff at airport)
 
 ---
 
-## 💰 Pricing Accuracy - Critical Points
+## ⚠️ Known Issue: Data Error Fixed
 
-### How Groundspan Pricing Works
+**Original Issue:** Row 8 in Excel showed "Cville → Central Virginia" as **0.003 hours**
 
-**Retail Model:**
-- Simple: $100/hour for sedan, regardless of location
-- Airport: Flat $105 to RIC from Central Virginia
+**Fixed To:** **3.0 hours** (file: `src/config/groundspan-rates.ts` line 67)
 
-**Groundspan Corporate Model:**
-- Route-based: $110 to RIC (1 hour)
-- But $455 to DCA (5 hours - includes driver round trip)
-- **The rate reflects TOTAL driver commitment, not just passenger ride time**
-
-### Example: DCA Airport Transfer
-
-**Scenario:** Corporate employee needs dropoff at Reagan National
-
-**Time Breakdown:**
-1. Driver leaves TNT base → Central Virginia pickup = 30 min
-2. Central Virginia → DCA = 2 hours
-3. Wait/service time = 30 min
-4. DCA → TNT base = 2 hours
-5. **TOTAL DRIVER TIME = 5 hours**
-
-**Therefore:** Rate = $455 (reflects 5-hour driver commitment)
-
-### Key Difference from Retail
-
-| Aspect | Retail | Groundspan Corporate |
-|---|---|---|
-| **Pricing Model** | Simple flat rates | Route-specific rates |
-| **Rate Basis** | Passenger experience | Total driver time |
-| **Calculation** | Service type + vehicle | Origin + Destination + Service Type + Vehicle |
-| **Discounts** | Automatic (Monday, 6+ hours) | Pre-negotiated in route rate |
+Verify this matches your contract.
 
 ---
 
-## 🔐 Security Considerations
+## 🔐 Security Notes
 
-### Current Security Status
-- ✅ Environment variables properly configured (`.env.local` in `.gitignore`)
-- ✅ Mapbox token restricted to localhost (update for production)
-- ⏳ No authentication yet (Phase 6)
-- ⏳ No payment processing yet (Phase 7)
+### Current Setup
+- ✅ Environment variables properly secured
+- ✅ Mapbox token configured for localhost
+- ⏳ Update Mapbox token for production domain
+- ⏳ No authentication (add if needed for corporate access)
 
-### Recommended for Production
-1. **Add Authentication:**
-   - Corporate employee login
-   - Account number verification
-   - Role-based access (employee vs admin)
-
-2. **Rate Limiting:**
-   - Protect Mapbox API from abuse
-   - Limit quote requests per IP
-
-3. **SSL Certificate:**
-   - Ensure HTTPS for all production traffic
-   - Vercel provides this automatically
+### For Production
+1. **Create production Mapbox token** at https://account.mapbox.com/
+2. Add URL restrictions:
+   ```
+   https://your-domain.com/*
+   https://*.vercel.app/*
+   ```
+3. Add to Vercel environment variables
 
 ---
 
-## 📞 Support & Next Steps
+## 📞 Support & Questions
 
-### Immediate Actions Needed
+**Technical Issues:**
+- GitHub Issues: https://github.com/sperry-entelech/tnt-groundspan-pricing-tool/issues
+- Email: sedan@tntauto.com
 
-1. **Verify Pricing Data:**
-   - Review all 74 routes in `groundspan-rates.ts`
-   - Correct the 0.003 hour error (row 8)
-   - Confirm rates match your contract
+**Pricing Questions:**
+- Compare `src/config/groundspan-rates.ts` against your Capital One contract
+- All 74 routes listed with rates and estimated hours
 
-2. **Implement Route-Based Pricing:**
-   - Update `pricing-calculator.ts` for Groundspan
-   - Add origin/destination UI to quote calculator
-   - Test all 74 route combinations
-
-3. **Customize Branding:**
-   - Add Groundspan logo
-   - Update contact information
-   - Adjust colors if needed
-
-### Future Enhancements (Phase 4+)
-
-- [ ] Database integration (Supabase)
-- [ ] Corporate authentication
-- [ ] Payment processing (Stripe)
-- [ ] Email notifications (SendGrid)
-- [ ] Admin dashboard
-- [ ] Booking management
-- [ ] Invoice generation
-
-### Getting Help
-
-**Technical Questions:**
-- Code issues: Check console logs (F12)
-- Deployment: Vercel support docs
-- Mapbox: https://docs.mapbox.com/
-
-**Business Questions:**
-- Pricing verification: Compare against contract
-- Route additions: Update `groundspan-rates.ts`
-- Feature requests: Document in GitHub Issues
+**Feature Requests:**
+- Submit GitHub issue or contact sedan@tntauto.com
 
 ---
 
-## 📁 Project Structure
+## 📁 Key Files Reference
 
 ```
-tnt-transportation-platform/
+tnt-groundspan-pricing-tool/
 ├── src/
-│   ├── app/                    # Next.js pages
-│   │   ├── page.tsx            # Retail portal
-│   │   ├── gnet/page.tsx       # GNET partner portal
-│   │   └── groundspan/page.tsx # Corporate portal ⭐
+│   ├── app/
+│   │   ├── page.tsx                 # Retail portal
+│   │   ├── gnet/page.tsx            # Partner portal
+│   │   └── groundspan/page.tsx      # ✅ Your corporate portal
 │   ├── components/
-│   │   ├── pricing/
-│   │   │   └── QuoteCalculator.tsx  # Main quote calculator
-│   │   └── booking/
-│   │       └── AddressAutocomplete.tsx  # Mapbox integration
+│   │   └── pricing/
+│   │       └── GroundspanQuoteCalculator.tsx  # ✅ Route-based calculator
 │   ├── config/
-│   │   ├── groundspan-rates.ts      # 74 corporate routes ⭐
+│   │   ├── groundspan-rates.ts      # ✅ Your 74 routes
 │   │   ├── rates.ts                 # Retail pricing
 │   │   ├── vehicles.ts              # Vehicle definitions
 │   │   └── airports.ts              # Airport/zone data
-│   ├── lib/
-│   │   └── pricing-calculator.ts    # Pricing engine ⚠️ Needs update
-│   └── types/
-│       └── pricing.ts               # TypeScript types
-├── public/
-│   └── images/
-│       └── tnt-logo.jpg             # TNT logo
-├── .env.local                       # Environment variables (not in git)
-├── GROUNDSPAN_PRICING_ANALYSIS.md   # Detailed pricing analysis
-└── GROUNDSPAN_HANDOFF.md            # This document
-
-⭐ = Groundspan-specific files
-⚠️ = Needs implementation work
+│   └── lib/
+│       └── pricing-calculator.ts    # ✅ Pricing engine (updated)
+├── .env.local                       # Mapbox token (already configured)
+└── README.md                        # Full documentation
 ```
 
 ---
 
 ## ✅ Pre-Deployment Checklist
 
-**Before sending to Groundspan IT team:**
+Before going live:
 
-- [ ] All pricing data verified against contract
-- [ ] Data error (0.003 hours) corrected
-- [ ] Contact information updated in code
-- [ ] Test all 74 routes for accuracy
-- [ ] Screenshots of working quote calculator
-- [ ] Mapbox production token created
-- [ ] Deployment instructions tested
-- [ ] This handoff document reviewed
-
-**After Groundspan Implementation:**
-
-- [ ] Route-based pricing calculator integrated
-- [ ] Origin/destination UI implemented
-- [ ] All 74 routes tested and working
-- [ ] Corporate branding customized
-- [ ] Production deployment verified
-- [ ] End-to-end user testing completed
+- [ ] Test all 74 routes against your contract
+- [ ] Update contact email and phone number
+- [ ] Add your company logo (optional)
+- [ ] Create production Mapbox token
+- [ ] Deploy to Vercel or your hosting
+- [ ] Set up custom domain (optional)
+- [ ] Test on mobile devices
+- [ ] Train corporate users
 
 ---
 
-## 🎓 Training Resources
+## 🎓 Additional Documentation
 
-**For Developers:**
-- Next.js 16 Docs: https://nextjs.org/docs
-- TypeScript Handbook: https://www.typescriptlang.org/docs
-- Tailwind CSS: https://tailwindcss.com/docs
-
-**For Business Users:**
-- How to verify pricing: See "Pricing Verification Checklist" above
-- How to add new routes: Edit `src/config/groundspan-rates.ts`
-- How to update contact info: Edit `src/app/groundspan/page.tsx`
+- **README.md** - Full project overview and setup
+- **GROUNDSPAN_PRICING_ANALYSIS.md** - Detailed pricing model explanation
+- **TESTING_VERIFICATION_REPORT.md** - Test cases and verification procedures
 
 ---
 
-**🎯 Ready for handoff! All core functionality is working. Main task: Implement Groundspan route-based pricing logic as documented above.**
+## 🎯 Summary
 
-**Questions? Contact: Sperry Entelech**
+**Everything works.** You have:
+- ✅ 74 corporate routes configured
+- ✅ Route-based pricing calculator
+- ✅ Professional corporate UI
+- ✅ Live demo deployed
+- ✅ Ready for production
+
+**Next Steps:**
+1. Verify pricing against your contract
+2. Update contact information
+3. Deploy to your domain (or use the demo)
+4. Train your users
+
+**Questions?** Check the GitHub repo or contact sedan@tntauto.com
+
+---
+
+**🚀 Ready to deploy!**
