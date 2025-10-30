@@ -51,7 +51,7 @@ export interface ZoneAirportRate {
 /**
  * All airports serviced by TNT
  */
-export const AIRPORTS: Airport[] = [
+export const AIRPORTS_ARRAY: Airport[] = [
   {
     code: 'RIC',
     name: 'Richmond International',
@@ -88,6 +88,14 @@ export const AIRPORTS: Airport[] = [
     state: 'VA'
   }
 ];
+
+/**
+ * Airport code to name mapping (for select dropdowns)
+ */
+export const AIRPORTS: Record<string, string> = AIRPORTS_ARRAY.reduce((acc, airport) => {
+  acc[airport.code] = airport.name;
+  return acc;
+}, {} as Record<string, string>);
 
 /**
  * Service zones for airport transfers
@@ -231,7 +239,7 @@ export const ZONE_AIRPORT_RATES: Record<VehicleId, ZoneAirportRate[]> = {
  * Get airport by code
  */
 export function getAirportByCode(code: string): Airport | undefined {
-  return AIRPORTS.find(a => a.code.toLowerCase() === code.toLowerCase());
+  return AIRPORTS_ARRAY.find(a => a.code.toLowerCase() === code.toLowerCase());
 }
 
 /**
@@ -271,7 +279,7 @@ export function getAvailableAirportsForZone(
     .filter(r => r.zone === zoneId)
     .map(r => r.airport);
 
-  return AIRPORTS.filter(a => availableCodes.includes(a.code));
+  return AIRPORTS_ARRAY.filter(a => availableCodes.includes(a.code));
 }
 
 /**
@@ -307,7 +315,7 @@ export function validateAirportRoute(
  * Get all airports as simple list
  */
 export function getAllAirportCodes(): string[] {
-  return AIRPORTS.map(a => a.code);
+  return AIRPORTS_ARRAY.map(a => a.code);
 }
 
 /**

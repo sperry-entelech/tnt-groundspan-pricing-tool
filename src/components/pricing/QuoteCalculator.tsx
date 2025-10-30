@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import AddressAutocomplete from '../booking/AddressAutocomplete';
-import { calculatePrice, compareServiceTypes } from '@/lib/pricing-calculator';
+import { calculatePrice, compareServiceTypes, DetailedBreakdown } from '@/lib/pricing-calculator';
 import { VEHICLES } from '@/config/vehicles';
 import { AIRPORTS } from '@/config/airports';
 import { Platform, ServiceType, QuoteResult, Address } from '@/types/pricing';
@@ -34,9 +34,10 @@ export default function QuoteCalculator({
   const [dropoffAddress, setDropoffAddress] = useState<Address | undefined>();
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [comparison, setComparison] = useState<{
-    hourly: QuoteResult;
-    pointToPoint: QuoteResult;
-    savings: number;
+    hourly: DetailedBreakdown;
+    pointToPoint: DetailedBreakdown;
+    airport?: DetailedBreakdown;
+    savings?: number;
     recommended: ServiceType;
   } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,8 +76,8 @@ export default function QuoteCalculator({
         bookingDate,
         hours: data.hours,
         pickupTime: data.pickupTime,
-        airport: data.airport,
-        zone: pickupAddress?.zone,
+        airportCode: data.airport,
+        zoneId: pickupAddress?.zone,
       });
 
       setQuote(result);
@@ -88,7 +89,7 @@ export default function QuoteCalculator({
           platform,
           serviceDate,
           bookingDate,
-          hours: data.hours || 3,
+          estimatedHours: data.hours || 3,
           pickupTime: data.pickupTime,
         });
         setComparison(comp);
@@ -96,7 +97,9 @@ export default function QuoteCalculator({
         setComparison(null);
       }
 
-      onQuoteGenerated?.(result);
+      if (result) {
+        onQuoteGenerated?.(result);
+      }
     } catch (error) {
       console.error('Error calculating quote:', error);
       alert('Error calculating quote. Please try again.');
@@ -367,7 +370,7 @@ export default function QuoteCalculator({
                 </div>
               </div>
 
-              {comparison.savings > 0 && (
+              {comparison.savings && comparison.savings > 0 && (
                 <div className="mt-6 bg-white/90 p-4 text-center border border-tnt-silver/20">
                   <p className="text-black font-light tracking-wide">
                     You save {formatCurrency(comparison.savings)} with {comparison.recommended} service

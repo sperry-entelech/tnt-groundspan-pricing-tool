@@ -95,18 +95,27 @@ export interface QuoteParams {
 /**
  * Detailed price breakdown
  */
-export interface DetailedBreakdown extends PriceBreakdown {
+export interface DetailedBreakdown {
   serviceType: ServiceType;
   platform: Platform;
   vehicleId: VehicleId;
+  vehicleType: string; // For QuoteResult compatibility
   hours?: number;
   vehicleCount: number;
 
-  // Rate components
+  // From PriceBreakdown
+  basePrice: number;
+  gratuity: number;
+  fuelSurcharge: number;
+  mileageCharge: number;
+  discounts: Discount[];
+  surcharges: Surcharge[];
+  subtotal: number;
+  total: number;
+
+  // Additional rate components
   baseRate?: number;
   driverGratuity?: number;
-  fuelSurcharge?: number;
-  mileageCharge?: number;
   corporatePremium?: number;
 
   // Before adjustments
@@ -117,6 +126,9 @@ export interface DetailedBreakdown extends PriceBreakdown {
   // GNET specific
   gnetCommission?: number;
   gnetCommissionRate?: number;
+
+  // For QuoteResult compatibility
+  breakdown: PriceBreakdown;
 }
 
 /**
@@ -161,17 +173,30 @@ function calculateHourlyPricing(params: QuoteParams): DetailedBreakdown {
           serviceType: 'hourly',
           platform,
           vehicleId,
+          vehicleType: vehicleId,
           hours: route.estimatedHours,
           vehicleCount,
           basePrice,
           gratuity: 0, // Included in route rate
+          fuelSurcharge: 0, // Included in route rate
+          mileageCharge: 0, // Included in route rate
           discounts: [], // No discounts for corporate routes
           surcharges: [],
           priceBeforeDiscounts: basePrice,
           priceAfterDiscounts: basePrice,
           priceAfterSurcharges: basePrice,
           subtotal: basePrice,
-          total: basePrice * vehicleCount
+          total: basePrice * vehicleCount,
+          breakdown: {
+            basePrice,
+            gratuity: 0,
+            fuelSurcharge: 0,
+            mileageCharge: 0,
+            discounts: [],
+            surcharges: [],
+            subtotal: basePrice,
+            total: basePrice * vehicleCount
+          }
         };
 
         // Skip discount/surcharge application for route-based pricing
@@ -183,50 +208,79 @@ function calculateHourlyPricing(params: QuoteParams): DetailedBreakdown {
     const groundspanRate = GROUNDSPAN_RATES[vehicleId];
     const basePrice = groundspanRate.hourlyPremium * actualHours;
 
-    breakdown = {
-      serviceType: 'hourly',
-      platform,
-      vehicleId,
-      hours: actualHours,
-      vehicleCount,
-      basePrice,
-      baseRate: groundspanRate.breakdown.baseRate * actualHours,
-      driverGratuity: groundspanRate.breakdown.driverGratuity * actualHours,
-      fuelSurcharge: groundspanRate.breakdown.fuelSurcharge * actualHours,
-      mileageCharge: groundspanRate.breakdown.mileageCharge * actualHours,
-      corporatePremium: groundspanRate.breakdown.corporatePremium * actualHours,
-      gratuity: groundspanRate.breakdown.driverGratuity * actualHours,
-      discounts: [],
-      surcharges: [],
-      priceBeforeDiscounts: basePrice,
-      priceAfterDiscounts: basePrice,
-      priceAfterSurcharges: basePrice,
-      subtotal: basePrice,
-      total: basePrice
-    };
-  } else {
-    // Standard retail/GNET/corporate rates
-    const basePrice = vehicleRates.totalStandard * actualHours;
+    const fuelSurcharge = groundspanRate.breakdown.fuelSurcharge * actualHours;
+    const mileageCharge = groundspanRate.breakdown.mileageCharge * actualHours;
+    const gratuity = groundspanRate.breakdown.driverGratuity * actualHours;
 
     breakdown = {
       serviceType: 'hourly',
       platform,
       vehicleId,
+      vehicleType: vehicleId,
       hours: actualHours,
       vehicleCount,
       basePrice,
-      baseRate: vehicleRates.baseRate * actualHours,
-      driverGratuity: vehicleRates.driverGratuity * actualHours,
-      fuelSurcharge: vehicleRates.fuelSurcharge * actualHours,
-      mileageCharge: vehicleRates.mileageCharge * actualHours,
-      gratuity: vehicleRates.driverGratuity * actualHours,
+      baseRate: groundspanRate.breakdown.baseRate * actualHours,
+      driverGratuity: gratuity,
+      fuelSurcharge,
+      mileageCharge,
+      corporatePremium: groundspanRate.breakdown.corporatePremium * actualHours,
+      gratuity,
       discounts: [],
       surcharges: [],
       priceBeforeDiscounts: basePrice,
       priceAfterDiscounts: basePrice,
       priceAfterSurcharges: basePrice,
       subtotal: basePrice,
-      total: basePrice
+      total: basePrice,
+      breakdown: {
+        basePrice,
+        gratuity,
+        fuelSurcharge,
+        mileageCharge,
+        discounts: [],
+        surcharges: [],
+        subtotal: basePrice,
+        total: basePrice
+      }
+    };
+  } else {
+    // Standard retail/GNET/corporate rates
+    const basePrice = vehicleRates.totalStandard * actualHours;
+    const fuelSurcharge = vehicleRates.fuelSurcharge * actualHours;
+    const mileageCharge = vehicleRates.mileageCharge * actualHours;
+    const gratuity = vehicleRates.driverGratuity * actualHours;
+
+    breakdown = {
+      serviceType: 'hourly',
+      platform,
+      vehicleId,
+      vehicleType: vehicleId,
+      hours: actualHours,
+      vehicleCount,
+      basePrice,
+      baseRate: vehicleRates.baseRate * actualHours,
+      driverGratuity: gratuity,
+      fuelSurcharge,
+      mileageCharge,
+      gratuity,
+      discounts: [],
+      surcharges: [],
+      priceBeforeDiscounts: basePrice,
+      priceAfterDiscounts: basePrice,
+      priceAfterSurcharges: basePrice,
+      subtotal: basePrice,
+      total: basePrice,
+      breakdown: {
+        basePrice,
+        gratuity,
+        fuelSurcharge,
+        mileageCharge,
+        discounts: [],
+        surcharges: [],
+        subtotal: basePrice,
+        total: basePrice
+      }
     };
   }
 
@@ -291,6 +345,7 @@ function calculatePointToPointPricing(params: QuoteParams): DetailedBreakdown {
     serviceType: 'point-to-point',
     platform,
     vehicleId,
+    vehicleType: vehicleId,
     hours: estimatedHours,
     vehicleCount,
     basePrice: baseTotal,
@@ -305,7 +360,17 @@ function calculatePointToPointPricing(params: QuoteParams): DetailedBreakdown {
     priceAfterDiscounts: baseTotal,
     priceAfterSurcharges: baseTotal,
     subtotal: baseTotal,
-    total: baseTotal
+    total: baseTotal,
+    breakdown: {
+      basePrice: baseTotal,
+      gratuity: vehicleRates.flatGratuity,
+      fuelSurcharge: vehicleRates.fuelSurcharge,
+      mileageCharge: vehicleRates.mileageCharge,
+      discounts: [],
+      surcharges: [],
+      subtotal: baseTotal,
+      total: baseTotal
+    }
   };
 
   // Apply Groundspan premium if applicable
@@ -395,17 +460,30 @@ function calculateAirportPricing(params: QuoteParams): DetailedBreakdown | null 
         serviceType: 'airport',
         platform,
         vehicleId,
+        vehicleType: vehicleId,
         vehicleCount,
         hours: route.estimatedHours,
         basePrice,
         gratuity: 0, // Included in route rate
+        fuelSurcharge: 0, // Included in route rate
+        mileageCharge: 0, // Included in route rate
         discounts: [], // No discounts for corporate routes
         surcharges: [],
         priceBeforeDiscounts: basePrice,
         priceAfterDiscounts: basePrice,
         priceAfterSurcharges: basePrice,
         subtotal: basePrice,
-        total: basePrice * vehicleCount
+        total: basePrice * vehicleCount,
+        breakdown: {
+          basePrice,
+          gratuity: 0,
+          fuelSurcharge: 0,
+          mileageCharge: 0,
+          discounts: [],
+          surcharges: [],
+          subtotal: basePrice,
+          total: basePrice * vehicleCount
+        }
       };
 
       return breakdown;
@@ -433,16 +511,29 @@ function calculateAirportPricing(params: QuoteParams): DetailedBreakdown | null 
     serviceType: 'airport',
     platform,
     vehicleId,
+    vehicleType: vehicleId,
     vehicleCount,
     basePrice,
     gratuity: 0, // Included in zone rate
+    fuelSurcharge: 0, // Included in zone rate
+    mileageCharge: 0, // Included in zone rate
     discounts: [],
     surcharges: [],
     priceBeforeDiscounts: basePrice,
     priceAfterDiscounts: basePrice,
     priceAfterSurcharges: basePrice,
     subtotal: basePrice,
-    total: basePrice
+    total: basePrice,
+    breakdown: {
+      basePrice,
+      gratuity: 0,
+      fuelSurcharge: 0,
+      mileageCharge: 0,
+      discounts: [],
+      surcharges: [],
+      subtotal: basePrice,
+      total: basePrice
+    }
   };
 
   // Apply Groundspan premium if applicable (12% for airport)
@@ -543,6 +634,7 @@ export function compareServiceTypes(params: {
     serviceType: 'hourly',
     serviceDate,
     hours: estimatedHours,
+    estimatedHours: estimatedHours,
     pickupTime,
     bookingDate
   });
